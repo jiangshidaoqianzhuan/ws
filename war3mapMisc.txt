@@ -9,8 +9,7 @@ AgiDefenseBonus=0.0
 AgiAttackSpeedBonus=0.01
 IntRegenBonus=0.0
 IntManaBonus=0.0
-MaxGuardDistance=100000.0
-GuardDistance=100000.0
-GuardReturnTime=10000.0
 MinUnitSpeed=10.0
+StrRegenBonus=0.0
+MaxHeroLevel=30
 
