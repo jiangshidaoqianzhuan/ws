@@ -33,9 +33,6 @@ constant boolean LIBRARY_YDWEGetUnitsOfPlayerAndTypeIdNull=true
 constant boolean LIBRARY_YDWEGetUnitsOfPlayerMatchingNull=true
 group yd_NullTempGroup
 //endglobals from YDWEGetUnitsOfPlayerMatchingNull
-//globals from YDWESetUnitFacingToFaceLocTimedNull:
-constant boolean LIBRARY_YDWESetUnitFacingToFaceLocTimedNull=true
-//endglobals from YDWESetUnitFacingToFaceLocTimedNull
 //globals from YDWETriggerEvent:
 constant boolean LIBRARY_YDWETriggerEvent=true
 trigger yd_DamageEventTrigger= null
@@ -51,14 +48,6 @@ integer YDWETriggerEvent___MoveItemEventNumber= 0
 //globals from YDWEGetUnitsOfPlayerAllNull:
 constant boolean LIBRARY_YDWEGetUnitsOfPlayerAllNull=true
 //endglobals from YDWEGetUnitsOfPlayerAllNull
-//globals from YDWEJumpTimer:
-constant boolean LIBRARY_YDWEJumpTimer=true
-//Ã¯‘æœµÕ≥”≈œ»º∂
-integer MoveMoreLevel_JumpTimer=3
-//endglobals from YDWEJumpTimer
-//globals from YDWESetUnitFacingToFaceUnitTimedNull:
-constant boolean LIBRARY_YDWESetUnitFacingToFaceUnitTimedNull=true
-//endglobals from YDWESetUnitFacingToFaceUnitTimedNull
 //globals from YDWETimerPattern:
 constant boolean LIBRARY_YDWETimerPattern=true
 boolexpr YDWETimerPattern__Bexpr= null
@@ -1030,15 +1019,6 @@ function YDWEGetUnitsOfPlayerMatchingNull takes player whichPlayer,boolexpr filt
 endfunction
 
 //library YDWEGetUnitsOfPlayerMatchingNull ends
-//library YDWESetUnitFacingToFaceLocTimedNull:
-function YDWESetUnitFacingToFaceLocTimedNull takes unit whichUnit,location target,real duration returns nothing
-    local location unitLoc= GetUnitLoc(whichUnit)
-    call SetUnitFacingTimed(whichUnit, AngleBetweenPoints(unitLoc, target), duration)
-    call RemoveLocation(unitLoc)
-    set unitLoc=null
-endfunction
-
-//library YDWESetUnitFacingToFaceLocTimedNull ends
 //library YDWETriggerEvent:
 	
 //===========================================================================  
@@ -1130,89 +1110,6 @@ function YDWEGetUnitsOfPlayerAllNull takes player whichPlayer returns group
 endfunction
 
 //library YDWEGetUnitsOfPlayerAllNull ends
-//library YDWEJumpTimer:
-function YDWEJumpTimerLoop takes nothing returns nothing
-    local timer t=GetExpiredTimer()
-    local unit hero=( (LoadUnitHandle(YDHT, StringHash((I2S((GetHandleId((t)))) )), StringHash(( "Hero")))) ) // INLINED!!
-    local real angle=(LoadReal(YDHT, StringHash((I2S((GetHandleId((t)))) )), StringHash(( "Angle")))) // INLINED!!
-    local integer steeps=(LoadInteger(YDHT, StringHash((I2S((GetHandleId((t)))) )), StringHash(( "steeps")))) // INLINED!!
-    local integer steepsMax=(LoadInteger(YDHT, StringHash((I2S((GetHandleId((t)))) )), StringHash(( "steepsMax")))) // INLINED!!
-    local real heightMax=(LoadReal(YDHT, StringHash((I2S((GetHandleId((t)))) )), StringHash(( "heightMax")))) // INLINED!!
-    local real dist=(LoadReal(YDHT, StringHash((I2S((GetHandleId((t)))) )), StringHash(( "dist")))) // INLINED!!
-    local real dheig=(LoadReal(YDHT, StringHash((I2S((GetHandleId((t)))) )), StringHash(( "dheig")))) // INLINED!!
-    local real OriginHeight=(LoadReal(YDHT, StringHash((I2S((GetHandleId((t)))) )), StringHash(( "OriginHeight")))) // INLINED!!
-    local real x=(LoadReal(YDHT, StringHash((I2S((GetHandleId((t)))) )), StringHash(( "X")))) // INLINED!!
-    local real y=(LoadReal(YDHT, StringHash((I2S((GetHandleId((t)))) )), StringHash(( "Y")))) // INLINED!!
-    local real x1=0
-    local real y1=0
-    local real height=0
-    local integer lvJumpTimer=MoveMoreLevel_JumpTimer
-    local integer lvUnitMove=(LoadInteger(YDHT, StringHash((I2S((GetHandleId((hero)))) )), StringHash(( "lvUnitMove")))) // INLINED!!
-    if steeps < steepsMax and lvJumpTimer >= lvUnitMove then
-        set x1=x + steeps * dist * Cos(angle * 3.14159 / 180.0)
-        set y1=y + steeps * dist * Sin(angle * 3.14159 / 180.0)
-        set x1=(RMinBJ(RMaxBJ(((x1)*1.0), yd_MapMinX), yd_MapMaxX)) // INLINED!!
-        set y1=(RMinBJ(RMaxBJ(((y1)*1.0), yd_MapMinY), yd_MapMaxY)) // INLINED!!
-        call SetUnitX(hero, x1)
-        call SetUnitY(hero, y1)
-        set steeps=steeps + 1
-        call SaveInteger(YDHT, StringHash((I2S((GetHandleId((t)))) )), StringHash(( "steeps" )), ( steeps)) // INLINED!!
-        set height=( - ( 2 * I2R(steeps) * dheig - 1 ) * ( 2 * I2R(steeps) * dheig - 1 ) + 1 ) * heightMax + OriginHeight
-        call SetUnitFlyHeight(hero, height, 99999)
-        call SetUnitFacing(hero, angle)
-      else
-        call SetUnitFlyHeight(hero, OriginHeight, 99999)
-        call SetUnitPathing(hero, true)
-        call DestroyTimer(t)
-        call FlushChildHashtable(YDHT, StringHash((I2S((GetHandleId((t))))))) // INLINED!!
-        call SaveInteger(YDHT, StringHash((I2S((GetHandleId((hero)))) )), StringHash(( "lvUnitMove" )), ( 0)) // INLINED!!
-        call YDWESyStemAbilityCastingOverTriggerAction(hero , 2)
-    endif
-    set t=null
-    set hero=null
-endfunction
-                            
-function YDWEJumpTimer takes unit hero,real angle,real distance,real lasttime,real timeout,real heightMax returns nothing
-    local timer t=null
-    local real x=GetUnitX(hero)
-    local real y=GetUnitY(hero)
-    local integer steepsMax=R2I(lasttime / timeout)
-    local integer steeps=0
-    local real dist=distance / steepsMax
-    local real dheig=1.0 / steepsMax
-    local real OriginHeight=GetUnitFlyHeight(hero)
-    local integer lvUnitMove=(LoadInteger(YDHT, StringHash((I2S((GetHandleId((hero)))) )), StringHash(( "lvUnitMove")))) // INLINED!!
-    if MoveMoreLevel_JumpTimer <= lvUnitMove then
-        return
-    endif
-    set t=CreateTimer()
-    call SaveInteger(YDHT, StringHash((I2S((GetHandleId((hero)))) )), StringHash(( "lvUnitMove" )), ( MoveMoreLevel_JumpTimer)) // INLINED!!
-    call YDWEFlyEnable(hero)
-    call SetUnitPathing(hero, false)
-    call SaveUnitHandle(YDHT, StringHash((I2S((GetHandleId((t)))) )), StringHash(( "Hero" )), ( hero)) // INLINED!!
-    call SaveReal(YDHT, StringHash((I2S((GetHandleId((t)))) )), StringHash(( "OriginHeight" )), (( OriginHeight)*1.0)) // INLINED!!
-    call SaveReal(YDHT, StringHash((I2S((GetHandleId((t)))) )), StringHash(( "Angle" )), (( angle)*1.0)) // INLINED!!
-    call SaveReal(YDHT, StringHash((I2S((GetHandleId((t)))) )), StringHash(( "dist" )), (( dist)*1.0)) // INLINED!!
-    call SaveReal(YDHT, StringHash((I2S((GetHandleId((t)))) )), StringHash(( "heightMax" )), (( heightMax)*1.0)) // INLINED!!
-    call SaveReal(YDHT, StringHash((I2S((GetHandleId((t)))) )), StringHash(( "dheig" )), (( dheig)*1.0)) // INLINED!!
-    call SaveReal(YDHT, StringHash((I2S((GetHandleId((t)))) )), StringHash(( "X" )), (( x)*1.0)) // INLINED!!
-    call SaveReal(YDHT, StringHash((I2S((GetHandleId((t)))) )), StringHash(( "Y" )), (( y)*1.0)) // INLINED!!
-    call SaveInteger(YDHT, StringHash((I2S((GetHandleId((t)))) )), StringHash(( "steeps" )), ( steeps)) // INLINED!!
-    call SaveInteger(YDHT, StringHash((I2S((GetHandleId((t)))) )), StringHash(( "steepsMax" )), ( steepsMax)) // INLINED!!
-    call TimerStart(t, timeout, true, function YDWEJumpTimerLoop)
-    set t=null
-endfunction
-
-//library YDWEJumpTimer ends
-//library YDWESetUnitFacingToFaceUnitTimedNull:
-function YDWESetUnitFacingToFaceUnitTimedNull takes unit whichUnit,unit target,real duration returns nothing
-    local location unitLoc= GetUnitLoc(target)
-    call YDWESetUnitFacingToFaceLocTimedNull(whichUnit , unitLoc , duration)
-    call RemoveLocation(unitLoc)
-    set unitLoc=null
-endfunction
-
-//library YDWESetUnitFacingToFaceUnitTimedNull ends
 //library YDWETimerPattern:
 //***************************************************
 //* °∆ - Matrix ÕÚƒ‹ƒ£∞Â∫Ø ˝
@@ -1800,7 +1697,7 @@ endfunction
 // 
 //   Warcraft III map script
 //   Generated by the Warcraft III World Editor
-//   Date: Thu Sep 22 14:36:11 2016
+//   Date: Thu Sep 22 14:43:48 2016
 //   Map Author: Êó†ÂèåÈ¨º
 // 
 //===========================================================================
@@ -1840,7 +1737,7 @@ function CreateUnitsForPlayer7 takes nothing returns nothing
     local integer unitID
     local trigger t
     local real life
-    set gg_unit_e002_0036=CreateUnit(p, 'e002', 3127.1, - 6304.6, 326.328)
+    set u=CreateUnit(p, 'e002', 3127.1, - 6304.6, 326.328)
 endfunction
 //===========================================================================
 function CreateNeutralPassive takes nothing returns nothing
@@ -1863,8 +1760,8 @@ function CreateNeutralPassive takes nothing returns nothing
     set u=CreateUnit(p, 'nvl2', 2131.8, - 3259.4, 42.870)
     set u=CreateUnit(p, 'nvl2', 3848.7, - 3244.7, 155.989)
     set u=CreateUnit(p, 'nhef', 2349.4, - 3158.9, 25.530)
-    set gg_unit_hpea_0022=CreateUnit(p, 'hpea', 3969.8, - 6882.5, 166.545)
-    set gg_unit_nvlk_0023=CreateUnit(p, 'nvlk', 2176.6, - 5865.8, 312.364)
+    set u=CreateUnit(p, 'hpea', 3969.8, - 6882.5, 166.545)
+    set u=CreateUnit(p, 'nvlk', 2176.6, - 5865.8, 312.364)
     set u=CreateUnit(p, 'nvk2', 2512.6, - 3027.6, 248.068)
     set u=CreateUnit(p, 'nvk2', 2927.6, - 3740.3, 82.234)
     set u=CreateUnit(p, 'nvk2', 2547.7, - 3182.8, 167.009)
@@ -1874,10 +1771,10 @@ function CreateNeutralPassive takes nothing returns nothing
     set u=CreateUnit(p, 'nvk2', 2392.6, - 3074.1, 291.707)
     set u=CreateUnit(p, 'nvk2', 2338.9, - 3975.7, 125.120)
     set u=CreateUnit(p, 'nvk2', 2095.9, - 4033.5, 63.854)
-    set gg_unit_hpea_0033=CreateUnit(p, 'hpea', 4134.5, - 7022.4, 166.545)
-    set gg_unit_hpea_0034=CreateUnit(p, 'hpea', 4082.2, - 6922.6, 147.038)
-    set gg_unit_hpea_0035=CreateUnit(p, 'hpea', 4168.1, - 6962.6, 169.469)
-    set gg_unit_e001_0037=CreateUnit(p, 'e001', 2692.3, - 5701.5, 307.070)
+    set u=CreateUnit(p, 'hpea', 4134.5, - 7022.4, 166.545)
+    set u=CreateUnit(p, 'hpea', 4082.2, - 6922.6, 147.038)
+    set u=CreateUnit(p, 'hpea', 4168.1, - 6962.6, 169.469)
+    set u=CreateUnit(p, 'e001', 2692.3, - 5701.5, 307.070)
     set u=CreateUnit(p, 'n00P', 5056.2, - 664.1, 198.489)
     set u=CreateUnit(p, 'n00S', 864.6, - 6890.4, 280.026)
     set u=CreateUnit(p, 'n00T', - 4631.6, - 7029.7, 28.574)
@@ -2206,7 +2103,7 @@ function Trig______________004Actions takes nothing returns nothing
     if ( ( GetSpellAbilityId() == 'A008' ) ) then
         call YDWETimerDestroyEffect(0.80 , AddSpecialEffectTarget("Abilities\\Weapons\\VengeanceMissile\\VengeanceMissile.mdl", GetSpellAbilityUnit(), "left"))
         call UnitDamageTarget(GetSpellAbilityUnit(), GetSpellTargetUnit(), ( I2R(R2I(I2R(GetHeroLevel(GetSpellAbilityUnit())))) * 10.00 ), true, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_WOOD_HEAVY_BASH)
-        call YDWETimerPatternRushSlide(GetSpellTargetUnit() , ( ( GetUnitFacing(GetSpellTargetUnit()) ) - ( 180.00 ) ) , 150.00 , 1 , 0.03 , 50.00 , false , true , false , "overhead" , "Abilities\\Weapons\\AvengerMissile\\AvengerMissile.mdl" , "Abilities\\Weapons\\SeaElementalMissile\\SeaElementalMissile.mdl")
+        call YDWETimerPatternRushSlide(GetSpellTargetUnit() , GetUnitFacing(GetSpellAbilityUnit()) , 150.00 , 1 , 0.03 , 50.00 , false , true , false , "overhead" , "Abilities\\Weapons\\AvengerMissile\\AvengerMissile.mdl" , "Abilities\\Weapons\\SeaElementalMissile\\SeaElementalMissile.mdl")
     else
     endif
     call FlushChildHashtable(YDHT, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step)
@@ -2419,86 +2316,6 @@ function InitTrig______________009 takes nothing returns nothing
     call TriggerAddAction(gg_trg______________009, function Trig______________009Actions)
 endfunction
 //===========================================================================
-// Trigger: ÁîµÂΩ±ÂºÄÂ§¥ÁâáÊÆµ 001
-//===========================================================================
-function Trig____________________001Actions takes nothing returns nothing
-    local integer ydl_localvar_step= LoadInteger(YDHT, GetHandleId(GetTriggeringTrigger()), 0xCFDE6C76)
-    set ydl_localvar_step=ydl_localvar_step + 3
-    call SaveInteger(YDHT, GetHandleId(GetTriggeringTrigger()), 0xCFDE6C76, ydl_localvar_step)
-    call SaveInteger(YDHT, GetHandleId(GetTriggeringTrigger()), 0xECE825E7, ydl_localvar_step)
-    call DisableTrigger(gg_trg______________003)
-    call ShowUnit(gg_unit_e001_0037, false)
-    call SaveLocationHandle(YDHT, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x9CD60476, GetRectCenter(gg_rct______________003))
-    call CinematicModeExBJ(true, GetPlayersAll(), 0.2)
-    call CameraSetupApplyForceDuration(gg_cam_Camera_001, true, 0)
-    call DisplayTimedTextToForce(GetPlayersAll(), 5.00, "TRIGSTR_198")
-    call TriggerSleepAction(1.00)
-    call SaveInteger(YDHT, GetHandleId(GetTriggeringTrigger()), 0xECE825E7, ydl_localvar_step)
-    call CameraSetupApplyForceDuration(gg_cam_Camera_003, true, 0.50)
-    call IssueTargetOrderById(gg_unit_hpea_0022, 851986, gg_unit_e002_0036)
-    call IssueTargetOrderById(gg_unit_hpea_0033, 851986, gg_unit_e002_0036)
-    call IssueTargetOrderById(gg_unit_hpea_0034, 851986, gg_unit_e002_0036)
-    call IssueTargetOrderById(gg_unit_hpea_0035, 851986, gg_unit_e002_0036)
-    call KillUnit(gg_unit_hpea_0022)
-    call TransmissionFromUnitWithNameBJ(GetPlayersAll(), gg_unit_hpea_0034, "TRIGSTR_199", null, "TRIGSTR_200", bj_TIMETYPE_ADD, 0, true)
-    call TransmissionFromUnitWithNameBJ(GetPlayersAll(), gg_unit_e002_0036, "TRIGSTR_201", null, "TRIGSTR_202", bj_TIMETYPE_ADD, 0, true)
-    call ShowUnit(gg_unit_e002_0036, true)
-    call YDWETimerDestroyEffect(0.50 , AddSpecialEffectTarget("Abilities\\Spells\\Undead\\RaiseSkeletonWarrior\\RaiseSkeleton.mdl", gg_unit_e002_0036, "origin"))
-    call TriggerSleepAction(0.10)
-    call SaveInteger(YDHT, GetHandleId(GetTriggeringTrigger()), 0xECE825E7, ydl_localvar_step)
-    call KillUnit(gg_unit_hpea_0033)
-    call IssueTargetOrderById(gg_unit_e002_0036, 851983, gg_unit_hpea_0034)
-    call TriggerSleepAction(0.50)
-    call SaveInteger(YDHT, GetHandleId(GetTriggeringTrigger()), 0xECE825E7, ydl_localvar_step)
-    call YDWESetUnitFacingToFaceUnitTimedNull(gg_unit_e002_0036 , gg_unit_e001_0037 , 0)
-    call SetUnitVertexColor(gg_unit_e002_0036, 255, 0, 0, 255)
-    call YDWETimerDestroyEffect(2 , AddSpecialEffectTarget("Abilities\\Spells\\Human\\FlameStrike\\FlameStrike1.mdl", gg_unit_e002_0036, "origin"))
-    call TriggerSleepAction(1.00)
-    call SaveInteger(YDHT, GetHandleId(GetTriggeringTrigger()), 0xECE825E7, ydl_localvar_step)
-    call KillUnit(gg_unit_hpea_0035)
-    call TriggerSleepAction(0.20)
-    call SaveInteger(YDHT, GetHandleId(GetTriggeringTrigger()), 0xECE825E7, ydl_localvar_step)
-    call SetUnitVertexColor(gg_unit_e002_0036, 255, 255, 255, 255)
-    call YDWESetUnitFacingToFaceUnitTimedNull(gg_unit_e002_0036 , gg_unit_e001_0037 , 0)
-    call TransmissionFromUnitWithNameBJ(GetPlayersAll(), gg_unit_e001_0037, "TRIGSTR_216", null, "TRIGSTR_217", bj_TIMETYPE_ADD, 0.30, true)
-    call ShowUnit(gg_unit_e001_0037, true)
-    call YDWETimerDestroyEffect(0.50 , AddSpecialEffectTarget("Abilities\\Spells\\Human\\ReviveHuman\\ReviveHuman.mdl", gg_unit_e001_0037, "origin"))
-    call IssueTargetOrder(gg_unit_e001_0037, "attack", gg_unit_e002_0036)
-    call IssueTargetOrder(gg_unit_e002_0036, "attack", gg_unit_e001_0037)
-    call TriggerSleepAction(3.00)
-    call SaveInteger(YDHT, GetHandleId(GetTriggeringTrigger()), 0xECE825E7, ydl_localvar_step)
-    call TransmissionFromUnitWithNameBJ(GetPlayersAll(), gg_unit_e002_0036, "TRIGSTR_220", null, "TRIGSTR_221", bj_TIMETYPE_ADD, 0.30, true)
-    call YDWETimerDestroyEffect(1.00 , AddSpecialEffectTarget("Abilities\\Spells\\Demon\\DarkConversion\\ZombifyTarget.mdl", gg_unit_e002_0036, "origin"))
-    call SetUnitScale(gg_unit_e002_0036, 2.50, 2.50, 2.50)
-    call IssueImmediateOrder(gg_unit_e001_0037, "stop")
-    call IssueImmediateOrder(gg_unit_e002_0036, "stop")
-    call YDWEJumpTimer(gg_unit_e001_0037 , ( ( GetUnitFacing(gg_unit_e001_0037) ) - ( 180.00 ) ) , 300.00 , 2 , 0.01 , 200.00)
-    call SetUnitAnimation(gg_unit_e001_0037, "Death")
-    call TransmissionFromUnitWithNameBJ(GetPlayersAll(), gg_unit_e001_0037, "TRIGSTR_224", null, "TRIGSTR_225", bj_TIMETYPE_ADD, 0.30, true)
-    call TransmissionFromUnitWithNameBJ(GetPlayersAll(), gg_unit_nvlk_0023, "TRIGSTR_218", null, "TRIGSTR_219", bj_TIMETYPE_ADD, 0.30, true)
-    call IssueTargetOrderById(gg_unit_nvlk_0023, 851986, gg_unit_e002_0036)
-    call TriggerSleepAction(3.00)
-    call SaveInteger(YDHT, GetHandleId(GetTriggeringTrigger()), 0xECE825E7, ydl_localvar_step)
-    call YDWEJumpTimer(gg_unit_nvlk_0023 , ( ( GetUnitFacing(gg_unit_nvlk_0023) ) - ( 180.00 ) ) , 200.00 , 2 , 0.01 , 600.00)
-    call TransmissionFromUnitWithNameBJ(GetPlayersAll(), gg_unit_e002_0036, "TRIGSTR_226", null, "TRIGSTR_227", bj_TIMETYPE_SET, 2.00, false)
-    call TriggerSleepAction(2.00)
-    call SaveInteger(YDHT, GetHandleId(GetTriggeringTrigger()), 0xECE825E7, ydl_localvar_step)
-    call KillUnit(gg_unit_nvlk_0023)
-    call IssuePointOrderLoc(gg_unit_e002_0036, "move", LoadLocationHandle(YDHT, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x9CD60476))
-    call TriggerSleepAction(2.00)
-    call SaveInteger(YDHT, GetHandleId(GetTriggeringTrigger()), 0xECE825E7, ydl_localvar_step)
-    call CameraSetupApplyForceDuration(gg_cam_Camera_002, true, 0)
-    call CinematicModeBJ(false, GetPlayersAll())
-    call EnableTrigger(gg_trg______________003)
-    call FlushChildHashtable(YDHT, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step)
-endfunction
-//===========================================================================
-function InitTrig____________________001 takes nothing returns nothing
-    set gg_trg____________________001=CreateTrigger()
-    call TriggerRegisterTimerEventSingle(gg_trg____________________001, 0.01)
-    call TriggerAddAction(gg_trg____________________001, function Trig____________________001Actions)
-endfunction
-//===========================================================================
 // Trigger: Êú™ÂëΩÂêçËß¶ÂèëÂô® 002
 //===========================================================================
 function Trig____________________002Actions takes nothing returns nothing
@@ -2524,7 +2341,6 @@ function InitCustomTriggers takes nothing returns nothing
     call InitTrig______________006()
     call InitTrig_____________007()
     call InitTrig______________009()
-    call InitTrig____________________001()
     call InitTrig____________________002()
 endfunction
 //===========================================================================
@@ -2726,7 +2542,7 @@ function main takes nothing returns nothing
     call CreateAllUnits()
     call InitBlizzard()
 
-call ExecuteFunc("jasshelper__initstructs8730190")
+call ExecuteFunc("jasshelper__initstructs9186602")
 call ExecuteFunc("YDTriggerSaveLoadSystem___Init")
 call ExecuteFunc("InitializeYD")
 call ExecuteFunc("YDWETimerPattern__Init")
@@ -2768,9 +2584,6 @@ endfunction
 //◊‘∂®“Â ¬º˛ 
 //===========================================================================
 //===========================================================================   
-//===========================================================================
-//Ã¯‘æœµÕ≥ 
-//===========================================================================
 
 
 
@@ -2802,7 +2615,7 @@ local integer this=f__arg_this
    return true
 endfunction
 
-function jasshelper__initstructs8730190 takes nothing returns nothing
+function jasshelper__initstructs9186602 takes nothing returns nothing
     set st__YDWETimerPattern__Thread_onDestroy[2]=CreateTrigger()
     set st__YDWETimerPattern__Thread_onDestroy[3]=st__YDWETimerPattern__Thread_onDestroy[2]
     set st__YDWETimerPattern__Thread_onDestroy[4]=st__YDWETimerPattern__Thread_onDestroy[2]
