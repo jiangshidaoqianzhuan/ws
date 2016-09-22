@@ -1229,30 +1229,6 @@ STRING 233
 抓捕(|cffffcc00D|r)  - [|cffffcc00CD10|r]
 }
 
-STRING 235
-// 技能: A008 (重击(|cffffcc00A|r)), Researchtip (提示工具 - 学习)
-{
-学习重击(|cffffcc00Q|r) - [|cffffcc00等级 %d|r]
-}
-
-STRING 237
-// 技能: A008 (重击(|cffffcc00A|r)), Tip (提示工具 - 普通)
-{
-重击(|cffffcc00Q|r) - [|cffffcc00等级 1|r]
-}
-
-STRING 238
-// 技能: A008 (重击(|cffffcc00A|r)), Tip (提示工具 - 普通)
-{
-重击(|cffffcc00Q|r) - [|cffffcc00等级 2|r]
-}
-
-STRING 239
-// 技能: A008 (重击(|cffffcc00A|r)), Tip (提示工具 - 普通)
-{
-重击(|cffffcc00Q|r) - [|cffffcc00等级 3|r]
-}
-
 STRING 250
 // 技能: A009 (快跑(|cffffcc00W|r)  - [|cffffcc00CD15|r]), Hotkey (热键 - 普通)
 {
@@ -1329,5 +1305,95 @@ STRING 264
 // 技能: A008 (重击(|cffffcc00A|r)), Name (名字)
 {
 重击(|cffffcc00A|r)
+}
+
+STRING 265
+// 单位: n00W (棕熊), Name (名字)
+{
+棕熊
+}
+
+STRING 266
+// 单位: n00X (猎豹), Name (名字)
+{
+猎豹
+}
+
+STRING 267
+// 单位: n00Y (巨兽), Name (名字)
+{
+巨兽
+}
+
+STRING 268
+// 单位: n00Z (猴子), Name (名字)
+{
+猴子
+}
+
+STRING 269
+// 单位: n010 (陆行鹰), Name (名字)
+{
+陆行鹰
+}
+
+STRING 271
+// 单位: n011 (老虎), Name (名字)
+{
+老虎
+}
+
+STRING 272
+// 单位: n012 (猩猩), Name (名字)
+{
+猩猩
+}
+
+STRING 273
+// 单位: n013 (狮子), Name (名字)
+{
+狮子
+}
+
+STRING 274
+// 单位: n00M (野猫), Name (名字)
+{
+野猫
+}
+
+STRING 275
+// 技能: A008 (重击(|cffffcc00A|r)), Researchtip (提示工具 - 学习)
+{
+学习重击(|cffffcc00A|r) - [|cffffcc00等级 %d|r]
+}
+
+STRING 276
+// 技能: A008 (重击(|cffffcc00A|r)), Tip (提示工具 - 普通)
+{
+重击(|cffffcc00A|r) - [|cffffcc00等级 1|r]
+}
+
+STRING 277
+// 技能: A008 (重击(|cffffcc00A|r)), Tip (提示工具 - 普通)
+{
+重击(|cffffcc00A|r) - [|cffffcc00等级 2|r]
+}
+
+STRING 278
+// 技能: A008 (重击(|cffffcc00A|r)), Tip (提示工具 - 普通)
+{
+重击(|cffffcc00A|r) - [|cffffcc00等级 3|r]
+}
+
+STRING 279
+// 单位: n014 (大型牢笼), Name (名字)
+{
+大型牢笼
+}
+
+STRING 280
+// 单位: n015 (小型牢笼), Name (名字)
+{
+小型牢笼
 }
 
