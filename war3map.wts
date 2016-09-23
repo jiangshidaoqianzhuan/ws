@@ -104,12 +104,6 @@ STRING 22
 狡猾的小孩
 }
 
-STRING 23
-// 单位: H006 (脑残的小孩), Name (名字)
-{
-脑残的小孩
-}
-
 STRING 24
 // 单位: z000 (小BOSS), Name (名字)
 {
@@ -162,12 +156,6 @@ STRING 32
 // 单位: H005 (狡猾的小孩), Propernames (称谓)
 {
 狡猾的小孩
-}
-
-STRING 33
-// 单位: H006 (脑残的小孩), Propernames (称谓)
-{
-脑残的小孩
 }
 
 STRING 34
@@ -267,13 +255,13 @@ Q
 }
 
 STRING 56
-// 技能: A005 (抓捕(|cffffcc00Q|r)  - [|cffffcc00CD10|r]), Hotkey (热键 - 普通)
+// 技能: A007 (火球), Hotkey (热键 - 普通)
 {
 Q
 }
 
 STRING 57
-// 技能: A007 (火球), Hotkey (热键 - 普通)
+// 技能: A00B (嘲讽), Hotkey (热键 - 普通)
 {
 Q
 }
@@ -489,13 +477,13 @@ STRING 92
 }
 
 STRING 93
-// 技能: A00B (嘲讽), Hotkey (热键 - 普通)
+// 技能: A00E (飞针(|cffffcc00Q|r) - [|cffffcc00CD10|r]), Hotkey (热键 - 普通)
 {
 Q
 }
 
 STRING 94
-// 科技: R000 (加强型石工技术,高级石工技术,终极石工技术), Hotkey (热键)
+// 技能: A005 (反击(|cffffcc00Q|r) - [|cffffcc00CD03|r]), Hotkey (热键 - 普通)
 {
 Q
 }
@@ -1076,12 +1064,6 @@ STRING 191
 鬣狗
 }
 
-STRING 194
-// 技能: A005 (抓捕(|cffffcc00Q|r)  - [|cffffcc00CD10|r]), Ubertip (提示工具 - 普通 - 扩展)
-{
-能够抓住一个动物。可能会激怒某些动物。
-}
-
 STRING 195
 // 科技: R000 (加强型石工技术,高级石工技术,终极石工技术), Hotkey (热键)
 {
@@ -1217,12 +1199,6 @@ STRING 231
 测图用
 }
 
-STRING 233
-// 技能: A005 (抓捕(|cffffcc00Q|r)  - [|cffffcc00CD10|r]), Tip (提示工具 - 普通)
-{
-抓捕(|cffffcc00D|r)  - [|cffffcc00CD10|r]
-}
-
 STRING 250
 // 技能: A009 (快跑(|cffffcc00W|r)  - [|cffffcc00CD15|r]), Hotkey (热键 - 普通)
 {
@@ -1275,12 +1251,6 @@ STRING 259
 // 技能: A008 (重击(|cffffcc00A|r)), Ubertip (提示工具 - 普通 - 扩展)
 {
 向目标打一拳对其造成伤害，并且眩晕。
-}
-
-STRING 261
-// 技能: A005 (抓捕(|cffffcc00Q|r)  - [|cffffcc00CD10|r]), Name (名字)
-{
-抓捕(|cffffcc00Q|r)  - [|cffffcc00CD10|r]
 }
 
 STRING 262
@@ -1508,5 +1478,182 @@ STRING 306
 // 物品: I002 (小型牢笼), Name (名字)
 {
 小型牢笼
+}
+
+STRING 327
+{
+选择英雄攻击方式
+}
+
+STRING 329
+// 单位: e004 (小石头), Name (名字)
+{
+小石头
+}
+
+STRING 331
+// 技能: A00F (扔石(|cffffcc00A|r)), Tip (提示工具 - 普通)
+{
+扔石(|cffffcc00A|r) - [|cffffcc00等级 1|r]
+}
+
+STRING 332
+// 技能: A00F (扔石(|cffffcc00A|r)), Tip (提示工具 - 普通)
+{
+扔石(|cffffcc00A|r) - [|cffffcc00等级 2|r]
+}
+
+STRING 333
+// 技能: A00F (扔石(|cffffcc00A|r)), Tip (提示工具 - 普通)
+{
+扔石(|cffffcc00A|r) - [|cffffcc00等级 3|r]
+}
+
+STRING 337
+// 技能: A00F (扔石(|cffffcc00A|r)), Hotkey (热键 - 普通)
+{
+A
+}
+
+STRING 338
+// 技能: A00F (扔石(|cffffcc00A|r)), Researchhotkey (热键 - 学习)
+{
+A
+}
+
+STRING 339
+// 技能: A00F (扔石(|cffffcc00A|r)), Name (名字)
+{
+扔石(|cffffcc00A|r)
+}
+
+STRING 341
+// 技能: A005 (反击(|cffffcc00Q|r) - [|cffffcc00CD03|r]), Tip (提示工具 - 普通)
+{
+扔石(|cffffcc00A|r)
+}
+
+STRING 346
+// 技能: A005 (反击(|cffffcc00Q|r) - [|cffffcc00CD03|r]), Tip (提示工具 - 普通)
+{
+扔石(|cffffcc00A|r)
+}
+
+STRING 353
+// 技能: A00F (扔石(|cffffcc00A|r)), Ubertip (提示工具 - 普通 - 扩展)
+{
+向目标扔出一块石头，伤害为英雄等级×10+技能等级×50。（对睡眠单位无效）
+}
+
+STRING 354
+// 技能: A00F (扔石(|cffffcc00A|r)), Ubertip (提示工具 - 普通 - 扩展)
+{
+向目标扔出一块石头，伤害为英雄等级×10+技能等级×50。（对睡眠单位无效）
+}
+
+STRING 355
+// 技能: A00F (扔石(|cffffcc00A|r)), Ubertip (提示工具 - 普通 - 扩展)
+{
+向目标扔出一块石头，伤害为英雄等级×10+技能等级×50。（对睡眠单位无效）
+}
+
+STRING 357
+{
+近战攻击
+}
+
+STRING 359
+{
+远程攻击
+}
+
+STRING 360
+// 单位: H006 (勇敢的小孩), Name (名字)
+{
+勇敢的小孩
+}
+
+STRING 361
+// 单位: H006 (勇敢的小孩), Propernames (称谓)
+{
+勇敢的小孩
+}
+
+STRING 362
+// 技能: A00E (飞针(|cffffcc00Q|r) - [|cffffcc00CD10|r]), Name (名字)
+{
+飞针(|cffffcc00Q|r) - [|cffffcc00CD10|r]
+}
+
+STRING 363
+// 技能: A00E (飞针(|cffffcc00Q|r) - [|cffffcc00CD10|r]), Tip (提示工具 - 普通)
+{
+飞针(|cffffcc00Q|r) - [|cffffcc00CD10|r]
+}
+
+STRING 364
+// 技能: A00E (飞针(|cffffcc00Q|r) - [|cffffcc00CD10|r]), Ubertip (提示工具 - 普通 - 扩展)
+{
+向目标投掷一小飞针，对其造成伤害并且眩晕。
+}
+
+STRING 366
+// 技能: A005 (反击(|cffffcc00Q|r) - [|cffffcc00CD03|r]), Name (名字)
+{
+反击(|cffffcc00Q|r) - [|cffffcc00CD03|r]
+}
+
+STRING 367
+// 技能: A005 (反击(|cffffcc00Q|r) - [|cffffcc00CD03|r]), Tip (提示工具 - 普通)
+{
+反击(|cffffcc00Q|r)
+}
+
+STRING 368
+// 技能: A005 (反击(|cffffcc00Q|r) - [|cffffcc00CD03|r]), Ubertip (提示工具 - 普通 - 扩展)
+{
+进行防御，如果防御期间被攻击则减少攻击伤害，对敌方造成伤害并击退。
+}
+
+STRING 369
+// 技能: A005 (反击(|cffffcc00Q|r) - [|cffffcc00CD03|r]), Researchhotkey (热键 - 学习)
+{
+A
+}
+
+STRING 370
+// 技能: A005 (反击(|cffffcc00Q|r) - [|cffffcc00CD03|r]), Ubertip (提示工具 - 普通 - 扩展)
+{
+向目标扔出一块石头，伤害为英雄等级×10+技能等级×50。（对睡眠单位无效）
+}
+
+STRING 371
+// 技能: A005 (反击(|cffffcc00Q|r) - [|cffffcc00CD03|r]), Ubertip (提示工具 - 普通 - 扩展)
+{
+向目标扔出一块石头，伤害为英雄等级×10+技能等级×50。（对睡眠单位无效）
+}
+
+STRING 373
+// 科技: R000 (加强型石工技术,高级石工技术,终极石工技术), Hotkey (热键)
+{
+Q
+}
+
+STRING 374
+// 技能: A00H (专注光环), Tip (提示工具 - 普通)
+{
+防御
+}
+
+STRING 376
+// 技能: A00H (专注光环), Ubertip (提示工具 - 普通 - 扩展)
+{
+进行防御
+}
+
+STRING 381
+// 魔法效果: B002 (-专注光环), EditorName (名字(编辑器))
+{
+-专注光环
 }
 
