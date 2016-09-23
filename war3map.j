@@ -48,6 +48,9 @@ integer YDWETriggerEvent___MoveItemEventNumber= 0
 //globals from YDWEGetUnitsOfPlayerAllNull:
 constant boolean LIBRARY_YDWEGetUnitsOfPlayerAllNull=true
 //endglobals from YDWEGetUnitsOfPlayerAllNull
+//globals from YDWESetGuard:
+constant boolean LIBRARY_YDWESetGuard=true
+//endglobals from YDWESetGuard
 //globals from YDWETimerPattern:
 constant boolean LIBRARY_YDWETimerPattern=true
 boolexpr YDWETimerPattern___Bexpr= null
@@ -108,6 +111,9 @@ trigger gg_trg_____________008= null
 trigger gg_trg______________009= null
 trigger gg_trg____________________001= null
 trigger gg_trg______________010= null
+trigger gg_trg______________011= null
+trigger gg_trg______________012= null
+trigger gg_trg______________013= null
 trigger gg_trg__________________________001= null
 unit gg_unit_hpea_0022= null
 unit gg_unit_nvlk_0023= null
@@ -116,9 +122,6 @@ unit gg_unit_hpea_0034= null
 unit gg_unit_hpea_0035= null
 unit gg_unit_e002_0036= null
 unit gg_unit_e001_0037= null
-trigger gg_trg______________011= null
-trigger gg_trg______________012= null
-trigger gg_trg______________013= null
 
 trigger l__library_init
 
@@ -1116,6 +1119,78 @@ function YDWEGetUnitsOfPlayerAllNull takes player whichPlayer returns group
 endfunction
 
 //library YDWEGetUnitsOfPlayerAllNull ends
+//library YDWESetGuard:
+function YDWESetGuard___IsUnitIdle takes unit u returns boolean
+    return OrderId2String(GetUnitCurrentOrder(u)) == null
+endfunction
+function YDWERemoveGuard takes unit pet returns nothing
+    local integer tm= (LoadInteger(YDHT, StringHash((I2S((GetHandleId((pet)))) )), StringHash(( "Timer")))) // INLINED!!
+    call FlushChildHashtable(YDHT, StringHash((I2S((GetHandleId((pet))))))) // INLINED!!
+    call FlushChildHashtable(YDHT, StringHash((I2S(tm)))) // INLINED!!
+    call DestroyTimer((LoadTimerHandle(YDHT, StringHash((I2S((GetHandleId((pet)))) )), StringHash(( "Timer"))))) // INLINED!!
+endfunction
+function SetGuardTimer takes nothing returns nothing
+  local timer tm= GetExpiredTimer()
+  local unit pet= ( (LoadUnitHandle(YDHT, StringHash((I2S((GetHandleId((tm)))) )), StringHash(( "Pet")))) ) // INLINED!!
+  local unit captain= ( (LoadUnitHandle(YDHT, StringHash((I2S((GetHandleId((tm)))) )), StringHash(( "Captain")))) ) // INLINED!!
+  local real x= GetUnitX(captain) - GetUnitX(pet)
+  local real y= GetUnitY(captain) - GetUnitY(pet)
+  local real d= x * x + y * y
+  local real v
+  local real a
+  local effect e=null
+  local real life= (LoadReal(YDHT, StringHash((I2S((GetHandleId((tm)))) )), StringHash(( "Life")))) // INLINED!!
+  local integer p= (LoadInteger(YDHT, StringHash((I2S((GetHandleId((tm)))) )), StringHash(( "Percent")))) // INLINED!!
+  set v=(LoadReal(YDHT, StringHash((I2S((GetHandleId((tm)))) )), StringHash(( "GuardRanger")))) // INLINED!!
+  if GetUnitState(pet, UNIT_STATE_LIFE) > 0 and GetUnitState(captain, UNIT_STATE_LIFE) > 0 then
+      if d < v * v then
+         if (OrderId2String(GetUnitCurrentOrder((pet))) == null) and GetRandomInt(0, 100) < p then // INLINED!!
+           set x=GetUnitX(captain)
+           set y=GetUnitY(captain)
+           set d=GetRandomReal(0, v)
+           set a=GetRandomReal(0, 360)
+           call IssuePointOrder(pet, "patrol", x + d * CosBJ(a), y + d * SinBJ(a))
+         endif
+      else
+        set v=(LoadReal(YDHT, StringHash((I2S((GetHandleId((tm)))) )), StringHash(( "ReturnRanger")))) // INLINED!!
+        if d < v * v then
+          if (OrderId2String(GetUnitCurrentOrder((pet))) == null) then // INLINED!!
+            call IssuePointOrder(pet, "patrol", GetUnitX(captain), GetUnitY(captain))
+          endif
+        else
+          set v=(LoadReal(YDHT, StringHash((I2S((GetHandleId((tm)))) )), StringHash(( "OutRanger")))) // INLINED!!
+            if d != 0 and d > v * v then
+              call SetUnitPosition(pet, GetUnitX(captain), GetUnitY(captain))
+              set e=AddSpecialEffectTarget("Abilities\\Spells\\Human\\MassTeleport\\MassTeleportTarget.mdl", captain, "chest")
+              call DestroyEffect(e)
+            else
+              call IssuePointOrder(pet, "move", GetUnitX(captain), GetUnitY(captain))
+            endif
+          endif
+       endif
+     else
+       call IssuePointOrder(pet, "attack", GetUnitX(captain), GetUnitY(captain))
+       call YDWERemoveGuard(pet)
+  endif
+  set tm=null
+  set pet=null
+  set captain=null
+  set e=null
+endfunction
+function YDWESetGuard takes unit pet,unit captain,real timeout,real guardRanger,real returnRanger,real outRanger,integer percent returns nothing
+    local timer tm= CreateTimer()
+    call SaveTimerHandle(YDHT, StringHash((I2S((GetHandleId((pet)))) )), StringHash(( "Timer" )), ( tm)) // INLINED!!
+    call SaveUnitHandle(YDHT, StringHash((I2S((GetHandleId((tm)))) )), StringHash(( "pet" )), ( pet)) // INLINED!!
+    call SaveUnitHandle(YDHT, StringHash((I2S((GetHandleId((tm)))) )), StringHash(( "Captain" )), ( captain)) // INLINED!!
+    call SaveInteger(YDHT, StringHash((I2S((GetHandleId((tm)))) )), StringHash(( "Percent" )), ( percent)) // INLINED!!
+    call SaveReal(YDHT, StringHash((I2S((GetHandleId((tm)))) )), StringHash(( "GuardRanger" )), (( guardRanger)*1.0)) // INLINED!!
+    call SaveReal(YDHT, StringHash((I2S((GetHandleId((tm)))) )), StringHash(( "ReturnRanger" )), (( returnRanger)*1.0)) // INLINED!!
+    call SaveReal(YDHT, StringHash((I2S((GetHandleId((tm)))) )), StringHash(( "OutRanger" )), (( outRanger)*1.0)) // INLINED!!
+    call TimerStart(tm, timeout, true, function SetGuardTimer)
+    set tm=null
+endfunction
+
+//library YDWESetGuard ends
 //library YDWETimerPattern:
 //***************************************************
 //* �� - Matrix ����ģ�庯��
@@ -1703,7 +1778,7 @@ endfunction
 // 
 //   Warcraft III map script
 //   Generated by the Warcraft III World Editor
-//   Date: Thu Sep 22 21:21:29 2016
+//   Date: Fri Sep 23 11:28:56 2016
 //   Map Author: 无双鬼
 // 
 //===========================================================================
@@ -1729,15 +1804,6 @@ function InitGlobals takes nothing returns nothing
 endfunction
 //***************************************************************************
 //*
-//*  Items
-//*
-//***************************************************************************
-function CreateAllItems takes nothing returns nothing
-    local integer itemID
-    call CreateItem('I001', - 4.1, - 501.7)
-endfunction
-//***************************************************************************
-//*
 //*  Unit Creation
 //*
 //***************************************************************************
@@ -1749,15 +1815,6 @@ function CreateUnitsForPlayer7 takes nothing returns nothing
     local trigger t
     local real life
     set u=CreateUnit(p, 'e002', 3127.1, - 6304.6, 326.328)
-endfunction
-//===========================================================================
-function CreateNeutralHostile takes nothing returns nothing
-    local player p= Player(PLAYER_NEUTRAL_AGGRESSIVE)
-    local unit u
-    local integer unitID
-    local trigger t
-    local real life
-    set u=CreateUnit(p, 'n00W', - 734.7, - 1086.5, 56.330)
 endfunction
 //===========================================================================
 function CreateNeutralPassive takes nothing returns nothing
@@ -1813,7 +1870,6 @@ endfunction
 //===========================================================================
 function CreateAllUnits takes nothing returns nothing
     call CreatePlayerBuildings()
-    call CreateNeutralHostile()
     call CreateNeutralPassive()
     call CreateUnitsForPlayer7() // INLINED!!
 endfunction
@@ -1989,17 +2045,11 @@ function Trig______________003Actions takes nothing returns nothing
         set bj_forLoopAIndex=bj_forLoopAIndex + 1
     endloop
     if ( ( ( GetUnitTypeId(GetDyingUnit()) == 'n00A' ) or ( GetUnitTypeId(GetDyingUnit()) == 'n00F' ) or ( GetUnitTypeId(GetDyingUnit()) == 'n00G' ) or ( GetUnitTypeId(GetDyingUnit()) == 'n00N' ) or ( GetUnitTypeId(GetDyingUnit()) == 'n00H' ) ) ) then
-        set bj_forLoopAIndex=1
-        set bj_forLoopAIndexEnd=2
-        loop
-            exitwhen bj_forLoopAIndex > bj_forLoopAIndexEnd
-            if ( ( GetForLoopIndexA() <= 1 ) ) then
-                call CreateItem('I000', GetUnitX(GetDyingUnit()), GetUnitY(GetDyingUnit()))
-            else
-                call DoNothing()
-            endif
-            set bj_forLoopAIndex=bj_forLoopAIndex + 1
-        endloop
+        call SaveInteger(YDHT, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x9FDB62AC, GetRandomInt(1, 2))
+        if ( ( LoadInteger(YDHT, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x9FDB62AC) == 1 ) ) then
+            call CreateItem('I000', GetUnitX(GetDyingUnit()), GetUnitY(GetDyingUnit()))
+        else
+        endif
     else
     endif
     if ( ( GetUnitTypeId(GetDyingUnit()) == 'n00T' ) ) then
@@ -2077,24 +2127,23 @@ function Trig______________004Actions takes nothing returns nothing
             call SaveUnitHandle(YDHT, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x9CD60476, GetSpellTargetUnit())
             call SaveInteger(YDHT, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x9FDB62AC, GetRandomInt(1, 10))
             if ( ( LoadInteger(YDHT, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x9FDB62AC) == 1 ) ) then
-                call SetUnitOwner(LoadUnitHandle(YDHT, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x9CD60476), GetOwningPlayer(GetSpellAbilityUnit()), true)
+                call SetUnitOwner(LoadUnitHandle(YDHT, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x9CD60476), Player(PLAYER_NEUTRAL_PASSIVE), true)
                 call SetUnitVertexColor(LoadUnitHandle(YDHT, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x9CD60476), 255, 255, 255, 255)
                 call SetUnitMoveSpeed(LoadUnitHandle(YDHT, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x9CD60476), GetUnitDefaultMoveSpeed(LoadUnitHandle(YDHT, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x9CD60476)))
             else
-                if ( true ) then
-                    call SetUnitUserData(LoadUnitHandle(YDHT, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x9CD60476), 1)
+                call SetUnitUserData(LoadUnitHandle(YDHT, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x9CD60476), 1)
+                if ( ( GetUnitUserData(LoadUnitHandle(YDHT, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x9CD60476)) == 1 ) ) then
                     call YDWETimerDestroyEffect(3.50 , AddSpecialEffectTarget("Abilities\\Spells\\Undead\\DarkRitual\\DarkRitualTarget.mdl", LoadUnitHandle(YDHT, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x9CD60476), "origin"))
                     call SetUnitVertexColor(LoadUnitHandle(YDHT, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x9CD60476), 255, 200, 200, 255)
                     call SetUnitMoveSpeed(LoadUnitHandle(YDHT, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x9CD60476), ( GetUnitDefaultMoveSpeed(LoadUnitHandle(YDHT, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x9CD60476)) + 60.00 ))
                     call SetUnitUserData(LoadUnitHandle(YDHT, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x9CD60476), ( GetUnitUserData(LoadUnitHandle(YDHT, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x9CD60476)) + 1 ))
                 else
-                endif
-                if ( ( GetUnitUserData(LoadUnitHandle(YDHT, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x9CD60476)) == 2 ) ) then
-                    call YDWETimerDestroyEffect(5.00 , AddSpecialEffectTarget("Abilities\\Spells\\Undead\\DarkRitual\\DarkRitualTarget.mdl", LoadUnitHandle(YDHT, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x9CD60476), "origin"))
-                    call SetUnitVertexColor(LoadUnitHandle(YDHT, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x9CD60476), 255, 100, 100, 255)
-                    call SetUnitState(LoadUnitHandle(YDHT, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x9CD60476), ConvertUnitState(0x12), ( GetUnitState(LoadUnitHandle(YDHT, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x9CD60476), ConvertUnitState(0x12)) + 10.00 ))
-                    call SetUnitUserData(LoadUnitHandle(YDHT, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x9CD60476), ( GetUnitUserData(LoadUnitHandle(YDHT, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x9CD60476)) + 1 ))
-                else
+                    if ( ( GetUnitUserData(LoadUnitHandle(YDHT, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x9CD60476)) == 2 ) ) then
+                        call YDWETimerDestroyEffect(5.00 , AddSpecialEffectTarget("Abilities\\Spells\\Undead\\DarkRitual\\DarkRitualTarget.mdl", LoadUnitHandle(YDHT, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x9CD60476), "origin"))
+                        call SetUnitVertexColor(LoadUnitHandle(YDHT, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x9CD60476), 255, 100, 100, 255)
+                        call SetUnitUserData(LoadUnitHandle(YDHT, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x9CD60476), ( GetUnitUserData(LoadUnitHandle(YDHT, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x9CD60476)) + 1 ))
+                    else
+                    endif
                 endif
             endif
         else
@@ -2324,6 +2373,9 @@ function Trig______________009Actions takes nothing returns nothing
         call IncUnitAbilityLevel(GetTriggerUnit(), 'A008')
     else
     endif
+    if ( ( GetHeroLevel(GetTriggerUnit()) == 20 ) ) then
+    else
+    endif
 endfunction
 //===========================================================================
 function InitTrig______________009 takes nothing returns nothing
@@ -2342,7 +2394,7 @@ function Trig______________010Actions takes nothing returns nothing
     set ydl_localvar_step=ydl_localvar_step + 3
     call SaveInteger(YDHT, GetHandleId(GetTriggeringTrigger()), 0xCFDE6C76, ydl_localvar_step)
     call SaveInteger(YDHT, GetHandleId(GetTriggeringTrigger()), 0xECE825E7, ydl_localvar_step)
-    if ( ( GetUnitTypeId(GetAttackedUnitBJ()) == 'n014' ) and ( ( GetUnitTypeId(GetEventDamageSource()) == 'n00S' ) or ( GetUnitTypeId(GetEventDamageSource()) == 'n00O' ) or ( GetUnitTypeId(GetEventDamageSource()) == 'n00Z' ) or ( GetUnitTypeId(GetEventDamageSource()) == 'n011' ) or ( GetUnitTypeId(GetEventDamageSource()) == 'n00X' ) or ( GetUnitTypeId(GetEventDamageSource()) == 'n013' ) or ( GetUnitTypeId(GetEventDamageSource()) == 'n012' ) or ( GetUnitTypeId(GetEventDamageSource()) == 'n00W' ) or ( GetUnitTypeId(GetEventDamageSource()) == 'n00P' ) or ( GetUnitTypeId(GetEventDamageSource()) == 'n010' ) ) ) then
+    if ( ( GetUnitTypeId(GetAttackedUnitBJ()) == 'n014' ) and ( R2I(GetUnitState(GetAttackedUnitBJ(), UNIT_STATE_LIFE)) == 10 ) and ( ( GetUnitTypeId(GetEventDamageSource()) == 'n00S' ) or ( GetUnitTypeId(GetEventDamageSource()) == 'n00O' ) or ( GetUnitTypeId(GetEventDamageSource()) == 'n00Z' ) or ( GetUnitTypeId(GetEventDamageSource()) == 'n011' ) or ( GetUnitTypeId(GetEventDamageSource()) == 'n00X' ) or ( GetUnitTypeId(GetEventDamageSource()) == 'n013' ) or ( GetUnitTypeId(GetEventDamageSource()) == 'n012' ) or ( GetUnitTypeId(GetEventDamageSource()) == 'n00W' ) or ( GetUnitTypeId(GetEventDamageSource()) == 'n00P' ) or ( GetUnitTypeId(GetEventDamageSource()) == 'n010' ) ) ) then
         set udg_Dian[1]=GetUnitLoc(udg_Dw[2])
         set udg_Dw[1]=GetEventDamageSource()
         call ShowUnit(udg_Dw[1], false)
@@ -2365,6 +2417,102 @@ function InitTrig______________010 takes nothing returns nothing
     set gg_trg______________010=CreateTrigger()
     call YDWESyStemAnyUnitDamagedRegistTrigger(gg_trg______________010)
     call TriggerAddAction(gg_trg______________010, function Trig______________010Actions)
+endfunction
+//===========================================================================
+// Trigger: 陷阱触发 011
+//===========================================================================
+function Trig______________011Func001Func008002001002 takes nothing returns boolean
+    return ( ( IsUnitType(GetEnumUnit(), UNIT_TYPE_HERO) == true ) )
+endfunction
+function Trig______________011Actions takes nothing returns nothing
+    if ( ( R2I(GetUnitState(udg_Dw[2], UNIT_STATE_MANA)) == 100 ) ) then
+        call DisplayTextToForce(GetPlayersAll(), ( ( "恭喜" + YDWEGetPlayerColorString(GetOwningPlayer(udg_Dw[2]) , GetPlayerName(GetOwningPlayer(udg_Dw[2]))) ) + ( "驯服了" + GetUnitName(udg_Dw[1]) ) ))
+        call SetUnitOwner(udg_Dw[1], GetOwningPlayer(udg_Dw[2]), true)
+        call RemoveUnit(udg_Dw[2])
+        call ShowUnit(udg_Dw[1], true)
+        call SetUnitPositionLoc(udg_Dw[1], udg_Dian[1])
+        call RemoveLocation(udg_Dian[1])
+        call UnitAddAbility(udg_Dw[1], 'Aloc')
+        call YDWESetGuard(udg_Dw[1] , FirstOfGroup(YDWEGetUnitsOfPlayerMatchingNull(GetOwningPlayer(udg_Dw[2]) , Condition(function Trig______________011Func001Func008002001002))) , 2 , 200.00 , 300.00 , 500.00 , 75)
+        call DisableTrigger(gg_trg______________011)
+    else
+    endif
+endfunction
+//===========================================================================
+function InitTrig______________011 takes nothing returns nothing
+    set gg_trg______________011=CreateTrigger()
+    call DisableTrigger(gg_trg______________011)
+    call TriggerRegisterTimerEventPeriodic(gg_trg______________011, 1.00)
+    call TriggerAddAction(gg_trg______________011, function Trig______________011Actions)
+endfunction
+//===========================================================================
+// Trigger: 陷阱触发 012
+//===========================================================================
+function Trig______________012Func001Func006002001002 takes nothing returns boolean
+    return ( ( IsUnitType(GetEnumUnit(), UNIT_TYPE_HERO) == true ) )
+endfunction
+function Trig______________012Actions takes nothing returns nothing
+    if ( ( R2I(GetUnitState(udg_Dw[3], UNIT_STATE_MANA)) == 100 ) ) then
+        call DisplayTextToForce(GetPlayersAll(), ( ( "恭喜" + YDWEGetPlayerColorString(GetOwningPlayer(udg_Dw[3]) , GetPlayerName(GetOwningPlayer(udg_Dw[3]))) ) + ( "驯服了" + GetUnitName(udg_Dw[4]) ) ))
+        call SetUnitOwner(udg_Dw[4], GetOwningPlayer(udg_Dw[3]), true)
+        call RemoveUnit(udg_Dw[3])
+        call ShowUnit(udg_Dw[4], true)
+        call UnitAddAbility(udg_Dw[4], 'Aloc')
+        call YDWESetGuard(udg_Dw[4] , FirstOfGroup(YDWEGetUnitsOfPlayerMatchingNull(GetOwningPlayer(udg_Dw[3]) , Condition(function Trig______________012Func001Func006002001002))) , 2 , 200.00 , 300.00 , 500.00 , 75)
+        call DisableTrigger(gg_trg______________011)
+    else
+    endif
+endfunction
+//===========================================================================
+function InitTrig______________012 takes nothing returns nothing
+    set gg_trg______________012=CreateTrigger()
+    call DisableTrigger(gg_trg______________012)
+    call TriggerRegisterTimerEventPeriodic(gg_trg______________012, 1.00)
+    call TriggerAddAction(gg_trg______________012, function Trig______________012Actions)
+endfunction
+//===========================================================================
+// Trigger: 陷阱触发 013
+//===========================================================================
+function Trig______________013Func001Func003Conditions takes nothing returns nothing
+    if ( ( ( GetUnitTypeId(GetEnteringUnit()) == 'n00A' ) or ( GetUnitTypeId(GetEnteringUnit()) == 'n00V' ) or ( GetUnitTypeId(GetEnteringUnit()) == 'n009' ) or ( GetUnitTypeId(GetEnteringUnit()) == 'n00B' ) or ( GetUnitTypeId(GetEnteringUnit()) == 'n00G' ) or ( GetUnitTypeId(GetEnteringUnit()) == 'n00F' ) or ( GetUnitTypeId(GetEnteringUnit()) == 'n00L' ) or ( GetUnitTypeId(GetEnteringUnit()) == 'n00M' ) or ( GetUnitTypeId(GetEnteringUnit()) == 'n00N' ) or ( GetUnitTypeId(GetEnteringUnit()) == 'n00U' ) or ( GetUnitTypeId(GetEnteringUnit()) == 'n00J' ) or ( GetUnitTypeId(GetEnteringUnit()) == 'n00H' ) ) ) then
+        set udg_Dw[4]=GetTriggerUnit()
+        call ShowUnit(udg_Dw[4], false)
+        call CreateNUnitsAtLoc(1, 'n017', GetOwningPlayer(LoadUnitHandle(YDHT, GetHandleId(GetTriggeringTrigger()), 0xA1614B4D)), LoadLocationHandle(YDHT, GetHandleId(GetTriggeringTrigger()), 0x25DAB820), bj_UNIT_FACING)
+        set udg_Dw[3]=GetLastCreatedUnit()
+        call SetUnitX(udg_Dw[4], GetUnitX(LoadUnitHandle(YDHT, GetHandleId(GetTriggeringTrigger()), 0xA1614B4D)))
+        call SetUnitY(udg_Dw[4], GetUnitY(LoadUnitHandle(YDHT, GetHandleId(GetTriggeringTrigger()), 0xA1614B4D)))
+        call EnableTrigger(gg_trg______________012)
+        call RemoveUnit(LoadUnitHandle(YDHT, GetHandleId(GetTriggeringTrigger()), 0xA1614B4D))
+        call RemoveLocation(LoadLocationHandle(YDHT, GetHandleId(GetTriggeringTrigger()), 0x25DAB820))
+        call FlushChildHashtable(YDHT, GetHandleId(GetTriggeringTrigger()))
+        call DestroyTrigger(GetTriggeringTrigger())
+    else
+    endif
+endfunction
+function Trig______________013Actions takes nothing returns nothing
+    local trigger ydl_trigger
+    local integer ydl_localvar_step= LoadInteger(YDHT, GetHandleId(GetTriggeringTrigger()), 0xCFDE6C76)
+    set ydl_localvar_step=ydl_localvar_step + 3
+    call SaveInteger(YDHT, GetHandleId(GetTriggeringTrigger()), 0xCFDE6C76, ydl_localvar_step)
+    call SaveInteger(YDHT, GetHandleId(GetTriggeringTrigger()), 0xECE825E7, ydl_localvar_step)
+    if ( ( GetUnitTypeId(GetConstructedStructure()) == 'n015' ) ) then
+        call SaveUnitHandle(YDHT, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xA1614B4D, GetConstructedStructure())
+        call SaveLocationHandle(YDHT, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x25DAB820, Location(GetUnitX(LoadUnitHandle(YDHT, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xA1614B4D)), GetUnitY(LoadUnitHandle(YDHT, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xA1614B4D))))
+        set ydl_trigger=CreateTrigger()
+        call SaveUnitHandle(YDHT, GetHandleId(ydl_trigger), 0xA1614B4D, LoadUnitHandle(YDHT, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xA1614B4D))
+        call SaveLocationHandle(YDHT, GetHandleId(ydl_trigger), 0x25DAB820, LoadLocationHandle(YDHT, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0x25DAB820))
+        call TriggerRegisterUnitInRangeSimple(ydl_trigger, 200.00, LoadUnitHandle(YDHT, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step, 0xA1614B4D))
+        call TriggerAddCondition(ydl_trigger, Condition(function Trig______________013Func001Func003Conditions))
+    else
+    endif
+    call FlushChildHashtable(YDHT, GetHandleId(GetTriggeringTrigger()) * ydl_localvar_step)
+    set ydl_trigger=null
+endfunction
+//===========================================================================
+function InitTrig______________013 takes nothing returns nothing
+    set gg_trg______________013=CreateTrigger()
+    call TriggerRegisterAnyUnitEventBJ(gg_trg______________013, EVENT_PLAYER_UNIT_CONSTRUCT_FINISH)
+    call TriggerAddAction(gg_trg______________013, function Trig______________013Actions)
 endfunction
 //===========================================================================
 // Trigger: 靠近动物增加仇恨 001
@@ -2433,52 +2581,6 @@ function InitTrig__________________________001 takes nothing returns nothing
     call TriggerAddAction(gg_trg__________________________001, function Trig__________________________001Actions)
 endfunction
 //===========================================================================
-// Trigger: 陷阱触发 011
-//===========================================================================
-function Trig______________011Actions takes nothing returns nothing
-    if ( ( R2I(GetUnitState(udg_Dw[2], UNIT_STATE_MANA)) == 10 ) ) then
-        call DisplayTextToForce(GetPlayersAll(), ( ( "恭喜" + YDWEGetPlayerColorString(GetOwningPlayer(udg_Dw[2]) , GetPlayerName(GetOwningPlayer(udg_Dw[2]))) ) + ( "驯服了" + GetUnitName(udg_Dw[1]) ) ))
-        call RemoveUnit(udg_Dw[2])
-        call ShowUnit(udg_Dw[1], true)
-        call SetUnitPositionLoc(udg_Dw[1], udg_Dian[1])
-        call SetUnitOwner(udg_Dw[1], GetOwningPlayer(udg_Dw[2]), true)
-        call RemoveLocation(udg_Dian[1])
-        call DisableTrigger(gg_trg______________011)
-    else
-    endif
-endfunction
-//===========================================================================
-function InitTrig______________011 takes nothing returns nothing
-    set gg_trg______________011=CreateTrigger()
-    call DisableTrigger(gg_trg______________011)
-    call TriggerRegisterTimerEventPeriodic(gg_trg______________011, 1.00)
-    call TriggerAddAction(gg_trg______________011, function Trig______________011Actions)
-endfunction
-//===========================================================================
-// Trigger: 陷阱触发 012
-//===========================================================================
-function Trig______________012Actions takes nothing returns nothing
-endfunction
-//===========================================================================
-function InitTrig______________012 takes nothing returns nothing
-    set gg_trg______________012=CreateTrigger()
-    call TriggerAddAction(gg_trg______________012, function Trig______________012Actions)
-endfunction
-//===========================================================================
-// Trigger: 陷阱触发 013
-//===========================================================================
-function Trig______________013Actions takes nothing returns nothing
-    if ( ( GetUnitTypeId(GetConstructedStructure()) == 'n014' ) ) then
-    else
-    endif
-endfunction
-//===========================================================================
-function InitTrig______________013 takes nothing returns nothing
-    set gg_trg______________013=CreateTrigger()
-    call TriggerRegisterAnyUnitEventBJ(gg_trg______________013, EVENT_PLAYER_UNIT_CONSTRUCT_FINISH)
-    call TriggerAddAction(gg_trg______________013, function Trig______________013Actions)
-endfunction
-//===========================================================================
 function InitCustomTriggers takes nothing returns nothing
     call InitTrig________001()
     call InitTrig______________001()
@@ -2490,10 +2592,10 @@ function InitCustomTriggers takes nothing returns nothing
     call InitTrig_____________007()
     call InitTrig______________009()
     call InitTrig______________010()
-    call InitTrig__________________________001()
     call InitTrig______________011()
     call InitTrig______________012()
     call InitTrig______________013()
+    call InitTrig__________________________001()
 endfunction
 //===========================================================================
 function RunInitializationTriggers takes nothing returns nothing
@@ -2691,11 +2793,10 @@ function main takes nothing returns nothing
     call SetMapMusic("Music", true, 0)
     call CreateRegions()
     call CreateCameras()
-    call CreateAllItems()
     call CreateAllUnits()
     call InitBlizzard()
 
-call ExecuteFunc("jasshelper__initstructs74685203")
+call ExecuteFunc("jasshelper__initstructs125531953")
 call ExecuteFunc("YDTriggerSaveLoadSystem__Init")
 call ExecuteFunc("InitializeYD")
 call ExecuteFunc("YDWETimerPattern___Init")
@@ -2729,13 +2830,16 @@ function config takes nothing returns nothing
     call InitCustomTeams()
     call InitAllyPriorities()
 endfunction
+//===========================================================================
+//ϵͳ-TimerSystem
+//===========================================================================
 //===========================================================================  
 //===========================================================================  
 //�Զ����¼� 
 //===========================================================================
 //===========================================================================   
 //===========================================================================
-//ϵͳ-TimerSystem
+//Ӷ��ϵͳ 
 //===========================================================================
 
 
@@ -2768,7 +2872,7 @@ local integer this=f__arg_this
    return true
 endfunction
 
-function jasshelper__initstructs74685203 takes nothing returns nothing
+function jasshelper__initstructs125531953 takes nothing returns nothing
     set st__YDWETimerPattern___Thread_onDestroy[2]=CreateTrigger()
     set st__YDWETimerPattern___Thread_onDestroy[3]=st__YDWETimerPattern___Thread_onDestroy[2]
     set st__YDWETimerPattern___Thread_onDestroy[4]=st__YDWETimerPattern___Thread_onDestroy[2]
